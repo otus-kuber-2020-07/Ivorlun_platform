@@ -43,10 +43,15 @@ Controlled By:  Node/minikube
 Name:                 kube-apiserver-minikube
 Controlled By:  Node/minikube
 ```
+Здесь видно, что поды контроллируются самим Node/minikube, но coredns, в отличие от других подов, управляется replicaset-контроллером.  
 
-Дело в статических файлах конфигурации, которые храняться в `/etc/kubernetes/manifests`: https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/#init-workflow
+Поды запускаются из-за статических файлов конфигурации, которые храняться в `/etc/kubernetes/manifests`: https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/#init-workflow
 
-Вопрос 1 - как создаётся pod?
+
+
+## Вопросы, которые на которые хочется получить ответ.
+
+Вопрос 1 - каков порядок  pod?
 Мы выполнили apply, после чего запрос ушёл в apiserver, где 
 1. сначала записал статус в etcd, а потом scheduler спросил у api сервера про наличие изменения в состоянии и ответил про выдачу ресурсов
 1. или сначала apiserver спросил у scheduler-а есть ли свободные ресурсы, а потом выдал разрешение на деплой и запуск контроллера?
