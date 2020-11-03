@@ -1,6 +1,7 @@
+### Основы
 Разворачивал по инструкции https://kubernetes.io/blog/2020/05/21/wsl-docker-kubernetes-on-the-windows-desktop/
 
-Minikube запускает докер контейнер (ubuntu 2004 wsl2 win 2004), внутри которого разворачивает ещё несколько докер контейнеров с 
+Minikube запускает докер контейнер (ubuntu 2004 wsl2 win 2004), внутри которого разворачивает ещё несколько докер контейнеров с инфраструктурой kubernetes
 ```
 docker ps
 CONTAINER ID        IMAGE                                 COMMAND                  CREATED             STATUS              PORTS                                                                                                      NAMES
@@ -48,8 +49,42 @@ Controlled By:  Node/minikube
 Поды запускаются из-за статических файлов конфигурации, которые храняться в `/etc/kubernetes/manifests`: https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/#init-workflow
 
 
+### Hipster-shop frontend
 
-## Вопросы, которые на которые хочется получить ответ.
+```
+kubectl get -A all
+NAMESPACE              NAME                                             READY   STATUS    RESTARTS   AGE
+default                pod/frontend                                     0/1     Error     0          46m
+default                pod/web                                          1/1     Running   1          83m
+kube-system            pod/coredns-f9fd979d6-kx6jp                      1/1     Running   1          2d23h
+```
+
+Не запускается из-за того, что приложение требует для запуска переменные среды.  
+
+```
+kubectl logs frontend
+{"message":"Tracing enabled.","severity":"info","timestamp":"2020-11-03T13:12:38.2787955Z"}
+{"message":"Profiling enabled.","severity":"info","timestamp":"2020-11-03T13:12:38.2788534Z"}
+panic: environment variable "PRODUCT_CATALOG_SERVICE_ADDR" not set
+
+goroutine 1 [running]:
+main.mustMapEnv(0xc0003fa000, 0xb1c129, 0x1c)
+        /src/main.go:259 +0x10b
+main.main()
+        /src/main.go:117 +0x510
+```
+Которые должны быть определены при запуске.
+
+https://github.com/GoogleCloudPlatform/microservices-demo/blob/5372b01cdcaf66eb9afd8750cc5b2693146637fb/kubernetes-manifests/frontend.yaml#L52
+
+Если добавить их определение в манифест пода, то ошибка при развёртке исчезнет:
+```
+kubectl get pod frontend
+NAME       READY   STATUS    RESTARTS   AGE
+frontend   1/1     Running   0          21s
+```
+
+## Вопросы, которые на которые хочется получить ответ от преподавателя.
 
 Вопрос 1 - каков порядок  pod?
 Мы выполнили apply, после чего запрос ушёл в apiserver, где 

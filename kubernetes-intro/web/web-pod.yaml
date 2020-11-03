@@ -10,21 +10,18 @@ spec:
   initContainers:
   - name: init-nginx
     image: busybox:1.32
-    command: 
-    - 'sh'
-    - '-c'
-    - 'wget -O- https://tinyurl.com/otus-k8s-intro | sh'
+    command: ['sh', '-c', 'wget -O- https://tinyurl.com/otus-k8s-intro | sh']
     volumeMounts:
     - name: app
-      mountPath: /app
+      mountPath: "/app"
   containers:
   - name: basic-nginx
-    image: ivorlun/basicnginx8000:0.1
+    image: ivorlun/basicnginx8000:0.2
     ports:
     - containerPort: 8000
     volumeMounts:
     - name: app
-      mountPath: /app
+      mountPath: "/app"
   volumes:
   - name: app
     emptyDir: {}
